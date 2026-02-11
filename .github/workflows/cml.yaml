@@ -50,21 +50,32 @@ jobs:
       
       - name: Generate metrics report
         if: github.event_name == 'pull_request'
-        run: python scripts/generate_report.py
+        run: |
+          echo "[CI] Starting report generation..."
+          python scripts/generate_report.py
+          echo "[CI] Report generation completed"
+          test -f report.md && echo "[CI] report.md exists" || echo "[CI] ERROR: report.md not found"
+          test -f report.md && cat report.md || echo "[CI] Cannot read report.md"
       
       - name: Comment PR with results
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && success()
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const report = fs.readFileSync('report.md', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: report
-            });
+            try {
+              const report = fs.readFileSync('report.md', 'utf8');
+              console.log('[CI] Successfully read report.md');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: report
+              });
+            } catch (error) {
+              console.error('[CI] Error reading report.md:', error);
+              throw error;
+            }
       
       - name: Upload model artifact (main only)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push' && success()
