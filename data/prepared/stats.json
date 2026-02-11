@@ -1,0 +1,6 @@
+{
+  "train_samples": 3927,
+  "test_samples": 982,
+  "positive_class_train": 167,
+  "positive_class_test": 42
+}

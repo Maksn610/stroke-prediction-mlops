@@ -1,0 +1,39 @@
+seed: 42
+
+mlflow:
+  tracking_uri: "file:./mlruns"
+  experiment_name: "HPO_Stroke_Lab3"
+  log_model: true
+  register_model: false
+  model_name: "StrokeOptimizedModel"
+  stage: "Staging"
+
+data:
+  processed_path: "data/prepared"
+
+model:
+  type: "random_forest"
+
+hpo:
+  n_trials: 30
+  sampler: "tpe"
+  metric: "f1"
+  direction: "maximize"
+  use_cv: false
+  cv_folds: 5
+  
+  random_forest:
+    n_estimators: {low: 30, high: 200}
+    max_depth: {low: 3, high: 15}
+    min_samples_split: {low: 2, high: 10}
+    min_samples_leaf: {low: 1, high: 5}
+  
+  logistic_regression:
+    C: {low: 1.0e-3, high: 1.0e2}
+    solver: ["liblinear", "lbfgs"]
+    penalty: ["l2"]
+
+hydra:
+  run:
+    dir: .
+  output_subdir: null

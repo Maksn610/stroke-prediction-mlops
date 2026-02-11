@@ -1,0 +1,17 @@
+stages:
+  prepare:
+    cmd: python src/prepare.py data/raw/stroke_data.csv data/prepared
+    deps:
+      - data/raw/stroke_data.csv
+      - src/prepare.py
+    outs:
+      - data/prepared:
+          cache: false
+  train:
+    cmd: python src/train.py data/prepared data/models
+    deps:
+      - data/prepared
+      - src/train.py
+    outs:
+      - data/models:
+          cache: false
