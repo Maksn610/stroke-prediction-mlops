@@ -23,14 +23,14 @@ y_test = test_data['stroke']
 
 model = RandomForestClassifier(
     n_estimators=50,
-    max_depth=6,
+    max_depth=5,
     min_samples_split=5,
     random_state=42,
     n_jobs=-1,
     class_weight='balanced'
 )
 
-print("Тренування моделі з новим max_depth=6...")
+print("Тренування моделі...")
 model.fit(X_train, y_train)
 
 y_pred_test = model.predict(X_test)
@@ -51,13 +51,21 @@ metrics = {
     "overfitting_gap": float(train_f1 - test_f1)
 }
 
+# Збережи модель у data/models/
 model_path = os.path.join(output_dir, 'model.pkl')
 joblib.dump(model, model_path)
+
+# ДОДАЙ: Збережи модель також у models/ для CI/CD
+os.makedirs('models', exist_ok=True)
+model_ci_path = 'models/best_optimized_model.pkl'
+joblib.dump(model, model_ci_path)
 
 metrics_path = os.path.join(output_dir, 'metrics.json')
 with open(metrics_path, 'w') as f:
     json.dump(metrics, f, indent=2)
 
-print(f"Модель збережена з max_depth=6")
+print(f"Модель збережена: {model_path}")
+print(f"Модель для CI: {model_ci_path}")
+print(f"Метрики збережені: {metrics_path}")
 print(f"Test F1-Score: {test_f1:.4f}")
 print(f"Test ROC-AUC: {test_roc_auc:.4f}")
