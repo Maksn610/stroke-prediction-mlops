@@ -50,8 +50,7 @@ jobs:
       
       - name: Generate metrics report
         if: github.event_name == 'pull_request'
-        run: |
-          python scripts/generate_report.py
+        run: python scripts/generate_report.py
       
       - name: Comment PR with results
         if: github.event_name == 'pull_request'
